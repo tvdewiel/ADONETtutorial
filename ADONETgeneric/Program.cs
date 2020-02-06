@@ -25,6 +25,12 @@ namespace ADONETtest
             //db.VoegCursusToe(c1);
             //db.VoegCursusToe(c2);
             //db.VoegCursusToe(c3);
+            //Cursus c4 = new Cursus("Programmeren 123");
+            //db.VoegCursusToe(c4);
+            //Cursus c5 = new Cursus("Programmeren 223");
+            //db.VoegCursusToe(c5);
+            //Cursus c6 = new Cursus("Programmeren 323");
+            //db.VoegCursusToe(c6);
 
             ////lees cursussen
             //foreach(Cursus s in db.GeefCursussen())
@@ -57,8 +63,14 @@ namespace ADONETtest
             //smc.cursussen.AddRange(db.GeefCursussen());
             //db.VoegStudentMetCursussenToe(smc);
 
-            Student s = db.GeefStudent(10);
-            s.ShowStudent();
+            //Student s = db.GeefStudent(10);
+            //s.ShowStudent();
+
+            //db.VerwijderCursussen(new List<int>() { 5, 6, 7 });
+
+            Cursus cursus = db.GeefCursus(4);
+            cursus.cursusnaam = "Programmeren c#";
+            db.UpdateCursus(cursus);
             //Console.WriteLine(s);
         }
     }

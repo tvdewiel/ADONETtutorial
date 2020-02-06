@@ -423,5 +423,109 @@ namespace ADONETgeneric
                 }
             }
         }
+        public Cursus GeefCursus(int id)
+        {
+            DbConnection connection = getConnection();
+            string query = "SELECT * FROM dbo.cursus WHERE id=@id";
+            using (DbCommand command = connection.CreateCommand())
+            {
+                command.CommandText = query;
+                DbParameter paramId = sqlFactory.CreateParameter();
+                paramId.ParameterName = "@Id";
+                paramId.DbType = DbType.Int32;
+                paramId.Value = id;
+                command.Parameters.Add(paramId);
+                connection.Open();
+                try
+                {
+                    DbDataReader reader = command.ExecuteReader();
+                    reader.Read();
+                    Cursus cursus = new Cursus((int)reader["Id"], (string)reader["cursusnaam"]);
+                    reader.Close();
+                    return cursus;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    return null;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        public void UpdateCursus(Cursus c)
+        {
+            DbConnection connection = getConnection();
+            Cursus cursusDB = GeefCursus(c.id);
+            string query = "SELECT * FROM dbo.cursus WHERE Id=@Id";
+           
+            using (DbDataAdapter adapter = sqlFactory.CreateDataAdapter())
+            {
+                try
+                {
+                    DbParameter paramId = sqlFactory.CreateParameter();
+                    paramId.ParameterName = "@Id";
+                    paramId.DbType = DbType.Int32;
+                    paramId.Value = c.id;
+                    DbCommandBuilder builder = sqlFactory.CreateCommandBuilder();
+                    builder.DataAdapter = adapter;
+                    adapter.SelectCommand = sqlFactory.CreateCommand();
+                    adapter.SelectCommand.CommandText = query;
+                    adapter.SelectCommand.Connection = connection;
+                    adapter.SelectCommand.Parameters.Add(paramId);
+                    adapter.UpdateCommand = builder.GetUpdateCommand();
+                    DataTable table = new DataTable();
+                    adapter.Fill(table);
+                    table.Rows[0]["cursusnaam"] = c.cursusnaam;
+                    
+                    adapter.Update(table);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        public void VerwijderCursussen(List<int> ids)
+        {
+            string query = "SELECT * FROM dbo.cursus";
+            DataSet ds = new DataSet();
+            DbConnection connection = getConnection();
+            using(DbDataAdapter adapter=sqlFactory.CreateDataAdapter())
+            {
+                try
+                {
+                    DbCommandBuilder builder = sqlFactory.CreateCommandBuilder();
+                    builder.DataAdapter = adapter;
+                    adapter.SelectCommand = sqlFactory.CreateCommand();
+                    adapter.SelectCommand.CommandText = query;
+                    adapter.SelectCommand.Connection = connection;
+                    adapter.DeleteCommand = builder.GetDeleteCommand();
+                    adapter.FillSchema(ds, SchemaType.Source, "cursus");
+                    adapter.Fill(ds, "cursus");
+                    
+                    foreach (int id in ids)
+                    {
+                        DataRow r = ds.Tables["cursus"].Rows.Find(id);
+                        r.Delete();
+                    }
+                    adapter.Update(ds, "cursus");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);                    
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }
