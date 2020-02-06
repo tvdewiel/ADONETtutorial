@@ -10,18 +10,22 @@ namespace ADONETgeneric
     public class DataBeheer
     {
         private DbProviderFactory sqlFactory;
-        private string connectionString;
-        private DbConnection connection;
+        private string connectionString;       
 
         public DataBeheer(DbProviderFactory sqlFactory, string connectionString)
         {
             this.sqlFactory = sqlFactory;
-            this.connectionString = connectionString;
-            connection = sqlFactory.CreateConnection();
+            this.connectionString = connectionString;           
+        }
+        private DbConnection getConnection()
+        {
+            DbConnection connection = sqlFactory.CreateConnection();
             connection.ConnectionString = connectionString;
+            return connection;
         }
         public void VoegCursusToe(Cursus c)
         {
+            DbConnection connection = getConnection();
             string query = "INSERT INTO dbo.cursus (cursusnaam) VALUES(@cursusnaam)";
             using (DbCommand command = connection.CreateCommand())
             {
@@ -48,6 +52,7 @@ namespace ADONETgeneric
         }
         public void VoegKlasToe(Klas k)
         {
+            DbConnection connection = getConnection();
             string query = "INSERT INTO dbo.klas (klasnaam) VALUES(@klasnaam)";
             using (DbCommand command = connection.CreateCommand())
             {
@@ -74,6 +79,7 @@ namespace ADONETgeneric
         }
         public void VoegKlassenToe(List<Klas> klist)
         {
+            DbConnection connection = getConnection();
             string query1 = "SELECT * FROM dbo.klas";
             try
             {
@@ -113,7 +119,8 @@ namespace ADONETgeneric
 
         }
         public void VoegStudentToe(Student s)
-        {            
+        {
+            DbConnection connection = getConnection();
             string queryS = "INSERT INTO dbo.student(naam,klasId) VALUES(@naam,@klasId)";
 
             using (DbCommand command = connection.CreateCommand())
@@ -147,6 +154,7 @@ namespace ADONETgeneric
         }
         public void VoegStudentMetCursussenToe(Student s)
         {
+            DbConnection connection = getConnection();
             string queryS = "INSERT INTO dbo.student(naam,klasId) output INSERTED.ID VALUES(@naam,@klasId)";
             string querySC = "INSERT INTO dbo.student_cursus(cursusId,studentId) VALUES(@cursusId,@studentId)";
 
@@ -206,6 +214,7 @@ namespace ADONETgeneric
         }
         //public void VoegStudentMetCursussenToe(Student s)
         //{
+        //    DbConnection connection = getConnection();
         //    string queryS = "INSERT INTO dbo.student(naam,klasId) output INSERTED.ID VALUES(@naam,@klasId)";
         //    string querySC = "INSERT INTO dbo.student_cursus(cursusId,studentId) VALUES(@cursusId,@studentId)";
 
@@ -268,6 +277,7 @@ namespace ADONETgeneric
         //}
         public void KoppelCursusAanStudent(int studentId,List<int> cursusIds)
         {
+            DbConnection connection = getConnection();
             string queryS = "INSERT INTO dbo.student_cursus(cursusId,studentId) VALUES(@cursusId,@studentId)";
 
             using (DbCommand command = connection.CreateCommand())
@@ -305,6 +315,7 @@ namespace ADONETgeneric
         }
         public IEnumerable<Cursus> GeefCursussen()
         {
+            DbConnection connection = getConnection();
             IList<Cursus> lg = new List<Cursus>();
             string query = "SELECT * FROM dbo.cursus";
             using (DbCommand command = connection.CreateCommand())
@@ -335,6 +346,7 @@ namespace ADONETgeneric
         }
         public Klas GeefKlas(int id)
         {
+            DbConnection connection = getConnection();
             string query = "SELECT * FROM dbo.klas WHERE id=@id";
             using (DbCommand command = connection.CreateCommand())
             {
@@ -350,7 +362,55 @@ namespace ADONETgeneric
                     DbDataReader reader=command.ExecuteReader();
                     reader.Read();
                     Klas klas = new Klas((int)reader["Id"],(string)reader["klasnaam"]);
+                    reader.Close();
                     return klas;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    return null;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        public Student GeefStudent(int id)
+        {
+            DbConnection connection = getConnection();
+            string queryS = "SELECT * FROM dbo.student WHERE id=@id";
+            string querySC = "SELECT * FROM [adresBeheer].[dbo].[cursus] t1,[adresBeheer].[dbo].[student_cursus] t2 "
+                +"where t1.Id = t2.cursusid and t2.studentid = @id";
+            using (DbCommand command = connection.CreateCommand())
+            {
+                command.CommandText = queryS;
+                DbParameter paramId = sqlFactory.CreateParameter();
+                paramId.ParameterName = "@Id";
+                paramId.DbType = DbType.Int32;
+                paramId.Value = id;
+                command.Parameters.Add(paramId);
+                connection.Open();
+                try
+                {
+                    DbDataReader reader = command.ExecuteReader();
+                    reader.Read();
+                    int studentId = (int)reader["Id"];
+                    string studentnaam = (string)reader["naam"];
+                    int klasId = (int)reader["klasId"];
+                    reader.Close();
+                    Klas klas = GeefKlas(klasId);
+                    Student student = new Student(studentId,studentnaam,klas);
+
+                    command.CommandText = querySC;
+                    reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Cursus cursus = new Cursus(reader.GetInt32(0), reader.GetString(1));
+                        student.voegCursusToe(cursus);
+                    }
+                    reader.Close();
+                    return student;
                 }
                 catch (Exception ex)
                 {

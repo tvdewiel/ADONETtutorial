@@ -50,11 +50,16 @@ namespace ADONETtest
 
 
             //db.KoppelCursusAanStudent(2, new List<int>() { 1, 3 });
-            Klas k = db.GeefKlas(3);
-            Student smc = new Student("Eli", k);
-            smc.cursussen.AddRange(db.GeefCursussen());
-            db.VoegStudentMetCursussenToe(smc);
-            
+
+
+            //Klas k = db.GeefKlas(3);
+            //Student smc = new Student("Eli", k);
+            //smc.cursussen.AddRange(db.GeefCursussen());
+            //db.VoegStudentMetCursussenToe(smc);
+
+            Student s = db.GeefStudent(10);
+            s.ShowStudent();
+            //Console.WriteLine(s);
         }
     }
 }
