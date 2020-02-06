@@ -1,5 +1,6 @@
 ﻿using ADONETgeneric;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 
@@ -16,20 +17,44 @@ namespace ADONETtest
             DbProviderFactory sqlFactory = DbProviderFactories.GetFactory("sqlserver");
 
             DataBeheer db = new DataBeheer(sqlFactory,connectionString);
-            Cursus c1 = new Cursus("Web1");
-            db.VoegCursusToe(c1);
-            //using(DbConnection connection = sqlFactory.CreateConnection())
-            //{
-            //    if (connection == null)
-            //    {
-            //        Console.WriteLine("no connection");
-            //        return;
-            //    }
-            //    connection.ConnectionString = connectionString;
-            //    connection.Open();
 
-            //    connection.Close();
+            ////voeg cursussen toe
+            //Cursus c1 = new Cursus("Web1");
+            //Cursus c2 = new Cursus("Web2");
+            //Cursus c3 = new Cursus("Programmeren3");
+            //db.VoegCursusToe(c1);
+            //db.VoegCursusToe(c2);
+            //db.VoegCursusToe(c3);
+
+            ////lees cursussen
+            //foreach(Cursus s in db.GeefCursussen())
+            //{
+            //    Console.WriteLine($"{s}");
             //}
+
+
+            ////voeg klas toe
+            //Klas k1 = new Klas("1D");
+            //Klas k2 = new Klas("2A");
+            //List<Klas> kl = new List<Klas>() { k1, k2 };
+            //db.VoegKlassenToe(kl);
+            ////db.VoegKlasToe(k1);
+
+            ////voeg student toe
+            //Klas k = db.GeefKlas(4);
+            //Student s1 = new Student("Inge", k);
+            //db.VoegStudentToe(s1);
+            ////Klas k = db.GeefKlas(4);
+            //Student s2 = new Student("Marcel", k);
+            //db.VoegStudentToe(s2);
+
+
+            //db.KoppelCursusAanStudent(2, new List<int>() { 1, 3 });
+            Klas k = db.GeefKlas(3);
+            Student smc = new Student("Eli", k);
+            smc.cursussen.AddRange(db.GeefCursussen());
+            db.VoegStudentMetCursussenToe(smc);
+            
         }
     }
 }
