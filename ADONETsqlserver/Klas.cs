@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ADONETgeneric
+namespace ADONETsqlserver
 {
     public class Klas
     {

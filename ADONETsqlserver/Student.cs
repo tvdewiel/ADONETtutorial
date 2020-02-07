@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ADONETgeneric
+namespace ADONETsqlserver
 {
     public class Student
     {
@@ -34,7 +34,7 @@ namespace ADONETgeneric
         public void ShowStudent()
         {
             Console.WriteLine($"{studentId},{naam},{klas}");
-            foreach (Cursus c in cursussen)
+            foreach(Cursus c in cursussen)
             {
                 Console.WriteLine($"{c}");
             }
