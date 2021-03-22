@@ -288,7 +288,7 @@ namespace ADONETsqlserver
         {
             SqlConnection connection = getConnection();
             string queryS = "SELECT * FROM dbo.studentSQL WHERE id=@id";
-            string querySC = "SELECT * FROM [adresBeheer].[dbo].[cursusSQL] t1,[adresBeheer].[dbo].[student_cursusSQL] t2 "
+            string querySC = "SELECT * FROM [dbo].[cursusSQL] t1,[dbo].[student_cursusSQL] t2 "
                 +"where t1.Id = t2.cursusid and t2.studentid = @id";
             using (SqlCommand command = connection.CreateCommand())
             {
@@ -433,6 +433,21 @@ namespace ADONETsqlserver
                 {
                     connection.Close();
                 }
+            }
+        }
+        public void BulkInsertCursus(List<Cursus> cursus)
+        {
+            using(SqlBulkCopy bc=new SqlBulkCopy(connectionString))
+            {
+                DataTable dt = new DataTable("cursus");
+                dt.Columns.Add(new DataColumn("Id", Type.GetType("System.Int32")));
+                dt.Columns.Add(new DataColumn("cursusnaam", Type.GetType("System.String")));
+                foreach(var c in cursus)
+                {
+                    dt.Rows.Add(c.id, c.cursusnaam);
+                }
+                bc.DestinationTableName = "cursusSQL";
+                bc.WriteToServer(dt);
             }
         }
     }

@@ -10,7 +10,7 @@ namespace ADONETsqlserver
         {
             Console.WriteLine("Hello World!");
 
-            string connectionString = "Data Source=aocws947;Initial Catalog=adresBeheer;Integrated Security=True";
+            string connectionString = @"Data Source=LAPTOP-TI22KMTL\SQLEXPRESS;Initial Catalog=ADONETTutorial;Integrated Security=True";
             
             DataBeheer db = new DataBeheer(connectionString);
 
@@ -28,7 +28,7 @@ namespace ADONETsqlserver
             //Cursus c6 = new Cursus("Programmeren 323");
             //db.VoegCursusToe(c6);
 
-            ////lees cursussen
+            //lees cursussen
             //foreach (Cursus s in db.GeefCursussen())
             //{
             //    Console.WriteLine($"{s}");
@@ -41,7 +41,7 @@ namespace ADONETsqlserver
             //Klas k3 = new Klas("1A");
             //Klas k4 = new Klas("1B");
             //Klas k5 = new Klas("1C");
-            //List<Klas> kl = new List<Klas>() { k1, k2,k3,k4 };
+            //List<Klas> kl = new List<Klas>() { k1, k2, k3, k4 };
             //db.VoegKlassenToe(kl);
             //db.VoegKlasToe(k5);
 
@@ -65,11 +65,16 @@ namespace ADONETsqlserver
             //Student s = db.GeefStudent(3);
             //s.ShowStudent();
 
-            //db.VerwijderCursussen(new List<int>() { 7,8,9 });
+            //db.VerwijderCursussen(new List<int>() { 7, 8});
 
-            Cursus cursus = db.GeefCursus(4);
-            cursus.cursusnaam = "Programmeren c#";
-            db.UpdateCursus(cursus);           
+            //Cursus cursus = db.GeefCursus(4);
+            //cursus.cursusnaam = "Programmeren c#";
+            //db.UpdateCursus(cursus);      
+
+            //Cursus c1 = new Cursus("Web1");
+            //Cursus c2 = new Cursus("Web2");
+            //Cursus c3 = new Cursus("Programmeren3");
+            db.BulkInsertCursus(new List<Cursus>() { new Cursus("Web1x"), new Cursus("Web1c"), new Cursus("Web1b") });
         }
     }
 }
